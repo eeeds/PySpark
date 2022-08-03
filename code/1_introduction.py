@@ -44,3 +44,103 @@ print(sc)
 
 # Print Spark version
 print(sc.version)
+"""
+Using DataFrames
+Spark's core data structure is the Resilient Distributed Dataset (RDD). This is a low level object that lets Spark work its magic by splitting data across multiple nodes in the cluster. However, RDDs are hard to work with directly, so in this course you'll be using the Spark DataFrame abstraction built on top of RDDs.
+
+The Spark DataFrame was designed to behave a lot like a SQL table (a table with variables in the columns and observations in the rows). Not only are they easier to understand, DataFrames are also more optimized for complicated operations than RDDs.
+
+When you start modifying and combining columns and rows of data, there are many ways to arrive at the same result, but some often take much longer than others. When using RDDs, it's up to the data scientist to figure out the right way to optimize the query, but the DataFrame implementation has much of this optimization built in!
+
+To start working with Spark DataFrames, you first have to create a SparkSession object from your SparkContext. You can think of the SparkContext as your connection to the cluster and the SparkSession as your interface with that connection.
+
+Remember, for the rest of this course you'll have a SparkSession called spark available in your workspace!
+
+Which of the following is an advantage of Spark DataFrames over RDDs?
+
+# Answer: 
+Operations using DataFrames are automatically optimized.
+"""
+
+"""
+Creating a SparkSession
+We've already created a SparkSession for you called spark, but what if you're not sure there already is one? Creating multiple SparkSessions and SparkContexts can cause issues, so it's best practice to use the SparkSession.builder.getOrCreate() method. This returns an existing SparkSession if there's already one in the environment, or creates a new one if necessary!
+
+Import SparkSession from pyspark.sql.
+Make a new SparkSession called my_spark using SparkSession.builder.getOrCreate().
+Print my_spark to the console to verify it's a SparkSession.
+"""
+
+# Import SparkSession from pyspark.sql
+from pyspark.sql import SparkSession
+
+# Create my_spark
+my_spark = SparkSession.builder.getOrCreate()
+
+# Print my_spark
+print(my_spark)
+"""
+Viewing tables
+Once you've created a SparkSession, you can start poking around to see what data is in your cluster!
+
+Your SparkSession has an attribute called catalog which lists all the data inside the cluster. This attribute has a few methods for extracting different pieces of information.
+
+One of the most useful is the .listTables() method, which returns the names of all the tables in your cluster as a list.
+See what tables are in your cluster by calling spark.catalog.listTables() and printing the result!
+"""
+# Print the tables in the catalog
+print(my_spark.catalog.listTables())
+
+"""
+Are you query-ious?
+One of the advantages of the DataFrame interface is that you can run SQL queries on the tables in your Spark cluster. If you don't have any experience with SQL, don't worry, we'll provide you with queries! (To learn more SQL, start with our Introduction to SQL course.)
+
+As you saw in the last exercise, one of the tables in your cluster is the flights table. This table contains a row for every flight that left Portland International Airport (PDX) or Seattle-Tacoma International Airport (SEA) in 2014 and 2015.
+
+Running a query on this table is as easy as using the .sql() method on your SparkSession. This method takes a string containing the query and returns a DataFrame with the results!
+
+If you look closely, you'll notice that the table flights is only mentioned in the query, not as an argument to any of the methods. This is because there isn't a local object in your environment that holds that data, so it wouldn't make sense to pass the table as an argument.
+
+Remember, we've already created a SparkSession called spark in your workspace. (It's no longer called my_spark because we created it for you!)
+
+Use the .sql() method to get the first 10 rows of the flights table and save the result to flights10. The variable query contains the appropriate SQL query.
+Use the DataFrame method .show() to print flights10.
+
+
+"""
+# Don't change this query
+query = "FROM flights SELECT * LIMIT 10"
+
+# Get the first 10 rows of flights
+flights10 = my_spark.sql(query)
+# Show the results
+flights10.show()
+"""
+Pandafy a Spark DataFrame
+Suppose you've run a query on your huge dataset and aggregated it down to something a little more manageable.
+
+Sometimes it makes sense to then take that table and work with it locally using a tool like pandas. Spark DataFrames make that easy with the .toPandas() method. Calling this method on a Spark DataFrame returns the corresponding pandas DataFrame. It's as simple as that!
+
+This time the query counts the number of flights to each airport from SEA and PDX.
+
+Remember, there's already a SparkSession called spark in your workspace!
+
+Instructions
+
+Run the query using the .sql() method. Save the result in flight_counts.
+Use the .toPandas() method on flight_counts to create a pandas DataFrame called pd_counts.
+Print the .head() of pd_counts to the console.
+
+
+"""
+# Don't change this query
+query = "SELECT origin, dest, COUNT(*) as N FROM flights GROUP BY origin, dest"
+
+# Run the query
+flight_counts = spark.sql(query)
+
+# Convert the results to a pandas DataFrame
+pd_counts = flight_counts.toPandas()
+
+# Print the head of pd_counts
+print(pd_counts.head())
