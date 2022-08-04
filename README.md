@@ -4,5 +4,5 @@ docker built -t spark .
 ```
 ## Run the docker image with the following command
 ```
-docker run -it spark /opt/spark/bin/pyspark
+docker run -it spark /bin/bash
 ```
